@@ -1,0 +1,38 @@
+#Import libraries
+import numpy as np
+from PIL import Image
+
+
+def compression(mat,e):
+    '''Takes in a matrix and threshold value and returns
+    a matrix which has that threshold compression applied.'''
+    
+    #Set the image as the matrix inputted
+    image = mat
+    
+    #Empty list to append compressed rows of the image to
+    rows = []
+    
+    #For loop which goes row by row for a matrix
+    for row in mat:
+        
+        #Nested for loop which indexes by index, value of each row
+        for i,pixel in enumerate(row):
+            
+            #If they value of the pixel is less than the threshold
+            #then twe make that value = 0
+            if pixel < e:
+                row[i] = 0
+        #After one row is compressed, add to rows list, and repeat
+        #for the remaining rows
+        rows.append(row)
+    
+    #Return the compressed matrix
+    return matrix(rows)
+
+#Import image (you may have to change the directory)
+seoul = Image.open('Downloads\\seoul.png')
+
+#Assign the grayscale_pixels array using numpy where 'L' in convert
+#just turns the RGB image data into grayscale data.
+grayscale_pixels = np.asarray(seoul.convert('L'))
