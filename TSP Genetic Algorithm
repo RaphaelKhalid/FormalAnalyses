@@ -1,0 +1,209 @@
+'''Genetic Algorithm Code'''
+
+### Import libraries random for genetic algorithm
+import random
+import matplotlib.pyplot as plt
+import pandas as pd
+
+#Initial data
+cities_data = pd.read_csv('cities.txt')
+
+#Randomly select 15 capital cities in the US
+city_df = cities_data.sample(15, random_state=4)
+
+#Make a list of 15 numbers 0-14 which represent each city
+cities = list(range(15))
+
+#Use the latitude and longitude data as x and y coordinates for finding euclidean distance
+x = list(city_df.latitude)
+y = list(city_df.longitude)
+
+def fitness(path):
+    '''Fitness function which returns the total distance between a set of points'''
+    
+    #Initialize distance as 0 to add to
+    distance = 0
+    
+    #Loop for 14 times because first you check the distance between 1-2, then 2-3 and so on
+    #Use the pythagorean theorem to calculate distance between two adjacent points in a list of
+    #points and add that distance to the counter
+    for i in range(14):
+        pyth = (((x[path[i]]-x[path[i+1]])**2 + (y[path[i]]-y[path[i+1]])**2))**0.5
+        distance += pyth
+    return distance
+
+def initialize():
+    '''This function gives us the initial population'''
+    
+    #Since this function has to be run several times, you assign a random seed every time to ensure different
+    #results for each path generated. One run of this function generates one path.
+    seed = random.random()
+    random.seed(seed)
+    
+    #This generates a random path from the cities list by shuffling it, ensuring unique elements
+    random.shuffle(cities)
+
+    #Use the fitness function defined above to calculate distance and append that to a list
+    dist = fitness(cities)
+    distances.append(dist)
+    
+    #Append the tuple of the actual path taken to a seperate list to keep track
+    paths.append(tuple(cities))
+
+
+def get_population(sorted_dict):
+    '''This function isolates the paths of the population'''
+    
+    population = []
+    for i in range(len(sorted_dict)):
+        population.append(list(sorted_dict[i][0]))
+    return population
+    
+
+def selection(pop, population):  
+    '''This function selects the top half of the population for reproduction'''
+    
+    selected = population[0:int(pop/2)]
+    return selected
+
+#Reinitialize data
+cities = list(range(15))
+x = list(city_df.latitude)
+y = list(city_df.longitude)
+
+
+
+
+def reproduction(pop, selected):
+    '''This function takes in a population number and the selected paths to return
+    the distances and paths of the children'''
+    
+    #Initialize lists to hold distances and paths
+    childrendist = []
+    childrenpath = []
+    
+    #A for loop to select parents two at a time using a step size of 2
+    for i in range(0, int(pop/2)-2, 2):
+        
+        #A step size of two ensures that this is first 1 and 2, then 3 and 4...
+        parent1 = selected[i]
+        parent2 = selected[i+1]
+        
+        #Keep the first half of the path from the parent
+        child1 = parent1[0:7]
+        child2 = parent2[0:7]
+
+        #This iterates through the parent chromosome and adds in elements which aren't duplicated 
+        #to cross over the genes. Repeated for child1 and child2.
+        
+        for i in parent2:
+            if i not in child1:
+                child1.append(i)
+        for i in parent1:
+            if i not in child2:
+                child2.append(i)
+                
+        #Mutation is set at 70% here 
+        mutate = random.random()
+        
+        #Randomly select two genes and swap them
+        if mutate > 0.3:
+            gene1 = random.choice(range(15))
+            gene2 = random.choice(range(15))
+            child1[gene1], child1[gene2] = child1[gene2], child1[gene1] 
+        mutate = random.random()
+        if mutate > 0.3:
+            gene1 = random.choice(range(15))
+            gene2 = random.choice(range(15))
+            child2[gene1], child2[gene2] = child2[gene2], child2[gene1]
+            
+        #Calculate the distances for the children and append to the lists
+        dist1 = 0
+        dist2 = 0
+        for i in range(14):
+            pyth1 = (((x[child1[i]]-x[child1[i+1]])**2 + (y[child1[i]]-y[child1[i+1]])**2))**0.5
+            dist1 += pyth1
+            pyth2 = (((x[child2[i]]-x[child2[i+1]])**2 + (y[child2[i]]-y[child2[i+1]])**2))**0.5
+            dist2 += pyth2
+        childrendist.append(dist1)
+        childrenpath.append(tuple(child1))
+        childrendist.append(dist2)
+        childrenpath.append(tuple(child2))
+    return childrendist, childrenpath
+
+
+def next_gen(pop, selected, sorted_dict):
+    '''This uses the children chromosomes to repeat evolution and returns a new selected population
+    and a sorted list which can be used for displaying in a data frame'''
+    
+    #Assign the children distances and path to variables using reproduction function, convert into a dictionary.
+    childrendist, childrenpath = reproduction(pop, selected)
+    dictionarychildren = dict(zip(childrenpath, childrendist)) 
+    sorted_dictchildren = sorted(dictionarychildren.items(), key=lambda x: x[1])
+    #Add the children onto the old dictionary to keep track
+    sorted_dict.extend(sorted_dictchildren)
+    sorted(sorted_dict, key=lambda sorted_dict: sorted_dict[1])
+    
+    #Initialize a list to hold next selected chromosomes
+    next_generation = []
+
+    for i in range(len(sorted_dict)):
+        next_generation.append(list(sorted_dict[i][0]))
+    new_selected = next_generation[0:int(pop/2)] 
+    return new_selected, sorted(sorted_dict, key=lambda sorted_dict: sorted_dict[1])
+
+
+'''Running the Code'''
+
+
+#Initialize paths and distances list
+paths = []
+distances = []
+
+#Run the intialize function 20 times to get a population of 20
+for i in range(20):
+    initialize()
+    
+#Set a random seed to see consistency of results later
+#random.seed(0)
+
+#Create the sorted dictionary to select the population and run it through the next_gen function
+dictionary = dict(zip(paths, distances)) 
+sorted_dict = sorted(dictionary.items(), key=lambda x: x[1])
+population = get_population(sorted_dict)
+selected = selection(20, population)
+new_selected, sorted_dict = next_gen(20, selected, sorted_dict[0:10])
+
+def iterate(epochs):
+    '''This repeats the next_gen function using the new_selected data'''
+    
+    #Use the global variables
+    global new_selected, sorted_dict
+    
+    #One next_gen function is run outside of this function to initialize the data so it is epochs-1
+    for i in range(epochs-1):
+        new_selected, sorted_dict = next_gen(20, new_selected, sorted_dict[0:10])
+    
+    #Display the top 5 paths
+    df = pd.DataFrame(sorted_dict, columns = ['Path', 'Distance'])
+    display(df.sort_values('Distance', ascending=True))
+    return sorted_dict[0][0], df.Distance[0]
+
+
+path, distance = iterate(20000)
+
+def visualize(path):
+    xcor = []
+    ycor = []
+    city_names = []
+    for i in path:
+        xcor.append(x[i])
+        ycor.append(y[i])
+        city_names.append(list(city_df.name)[i])
+    plt.plot(xcor, ycor, marker='o', markersize=10, mfc='black')
+    plt.show()
+    return city_names
+
+visualize(path)
+print("The distance of the path is: " + str(distance))
+print("The optimal path is " + str(city_names))
