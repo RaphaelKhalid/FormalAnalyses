@@ -1,0 +1,19 @@
+from scipy import stats #for later
+
+def simulation(n, measurements):
+    right = []         #each entry is the number of correct matches per simulation, 
+                       #creating this list will also help us plot a PMF in 4.4
+    for sim in range(n):  #one iteration represents 1 simulation
+        one_sim_right = 0 #this counts the number of matches in this one simulation
+        rand_measurements = np.random.choice(measurements,len(measurements),replace=False)
+        for i in range(len(measurements)):  #this checks each 'napkin' to see if it is in the
+                                        #the right order and adds +1 to one_sim_right if it is.
+            if measurements[i] == rand_measurements[i]:
+                one_sim_right += 1
+                
+        right.append(one_sim_right) #this adds the number of matches in one simulation to the list
+    
+    return mean(right)    #returns the sum/total i.e. the expected value using function from 3.1b
+
+print(simulation(10000, vehicles))
+print(simulation(10000, range(90)))
