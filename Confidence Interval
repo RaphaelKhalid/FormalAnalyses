@@ -1,0 +1,20 @@
+def CI(slope, std_err):
+    #Sets sample size
+    n = len(house['price'])
+    #The alpha value here is now 0.05
+    alpha = 1 - (95/100)
+    #The critical probability is set at 0.975
+    critical_probability = 1-alpha/2
+    #Degrees of freedom 2 less than sample size
+    df = n - 2
+
+    #Takes the arguments of critical probability and df to return critical t value
+    t = stats.t.ppf(critical_probability, df=n)
+    #Use the formula ME = t*std_err
+    margin_of_error = t * std_err
+    #The margin of error is for the slope parameter
+    lower_bound = slope - margin_of_error
+    upper_bound = slope + margin_of_error
+    #Round the lower and upper bounds of the CI to 2 d.p.
+    CI = [round(lower_bound,2), round(upper_bound,2)]
+    return CI
