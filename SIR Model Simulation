@@ -1,0 +1,94 @@
+#Set initial values using https://www.worldometers.info/coronavirus/usa/california/ as of 3/9/2021
+#Where the population of California is 39.51m, active cases are 1,660,878, and the total removed is 
+#1,890,478 recovered
+
+S = 39510000
+I = 1660878
+R = 1890478
+b = 0.085
+k = 0.062
+t = 0
+N = S+I+R
+h = 0.1
+
+#Define functions
+
+def eulerS(S, I, t, h):
+    '''This function takes in number of susceptible, infected, time and step size to output
+    the next number of susceptible which is done using the differential equation above and multiplying
+    that by the step size and adding it to S'''
+    slope = (-b/N) * S * I
+    t1 = t + h 
+    S1 = S + h*slope
+    return S1, t1
+
+def eulerI(S, I, t, h):
+    '''This function takes in number of susceptible, infected, time and step size to output
+    the next number of infected which is done using the differential equation above and multiplying
+    that by the step size and adding it to I'''
+    
+    slope = (b/N) * S * I - (k*I)
+    t1 = t + h 
+    I1 = I + h*slope
+    return I1, t1
+
+def eulerR(R, I, t, h):
+    '''This function takes in number of recovered, infected, time and step size to output
+    the next number of recovered which is done using the differential equation above and multiplying
+    that by the step size and adding it to R'''
+    
+    slope = k*I
+    t1 = t + h 
+    R1 = R + h*slope
+    return R1, t1
+
+#Run the functions for the first time to initialize values to use in the for loop
+s = eulerS(S, I, t, h)
+i = eulerI(S, I, t, h)
+r = eulerR(R, I, t, h)
+
+#Have lists to keep track of the number of SIR and time as they change starting with initial values
+susceptible = [S]
+infected = [I]
+recovered = [R]
+days = [0]
+
+#Accesses the first element of the tuple returned by eulerS, eulerI, & eulerR which is the respective number
+#and append it to the list
+susceptible.append(s[0])
+infected.append(i[0])
+recovered.append(r[0])
+
+#Access the second element of eulerS's tuple which is the time. This can be accessed from eulerI or eulerR too
+days.append(s[1])
+
+
+#Run a for loop where you reassign s,i,r to the functions again and repeat the process of appending to the list
+for _ in range(5000):
+    #s[0] here for example is the number of susceptible people after running the function once, this updates
+    #every loop.
+    s = eulerS(s[0], i[0], s[1], h)
+    i = eulerI(s[0],i[0], s[1], h)
+    r = eulerR(r[0], i[0], s[1], h)
+    
+    #Append to lists
+    susceptible.append(s[0])
+    infected.append(i[0])
+    recovered.append(r[0])
+    days.append(s[1])
+    
+#Set figure size 10x5
+plt.figure(figsize=(10,5))
+
+#Plot time against SIR and label for legend
+plt.plot(days, susceptible, label='Susceptible')
+plt.plot(days, infected, label='Infected')
+plt.plot(days, recovered, label='Recovered')
+plt.legend()
+plt.xlabel('Days')
+plt.ylabel('Population')
+#Start the x axis at 0
+plt.xlim(0)
+plt.show()
+
+print("The maximum number of infected all at once could reach " + str(round(max(infected))) + ' without restrictions.')
