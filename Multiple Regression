@@ -1,0 +1,30 @@
+def mult_regression(column_x, column_y):
+    ''' this function uses built in library functions to construct a linear 
+    regression model with potentially multiple predictor variables. It outputs 
+    two plots to assess the validity of the model.'''
+
+    # If there is only one predictor variable, plot the regression line
+    if len(column_x)==1:
+        plt.figure()
+        sns.regplot(x=column_x[0], y=column_y, data=house, marker="+",fit_reg=True,color='orange')
+    
+    # define predictors X and response Y:
+    X = house[column_x]
+    X = smf.add_constant(X)
+    Y = house[column_y]
+    
+    # construct model:
+    global regressionmodel 
+    regressionmodel = smf.OLS(Y,X).fit() # OLS = "ordinary least squares"
+
+    # residual plot:
+    plt.figure()
+    residualplot = sns.residplot(x=regressionmodel.predict(), y=regressionmodel.resid, color='gray')
+    residualplot.set(xlabel='Fitted values for '+column_y, ylabel='Residuals')
+    residualplot.set_title('Residuals vs Fitted values',fontweight='bold',fontsize=14)
+    plt.savefig('residplot.png',dpi=300)
+    
+    # QQ plot:
+    qqplot = smf.qqplot(regressionmodel.resid,fit=True,line='45', c='black', alpha=0.5)
+    qqplot.suptitle("QQ Plot for Residuals")
+    plt.savefig('QQplot.png',dpi=300)
