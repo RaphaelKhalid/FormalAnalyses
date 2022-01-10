@@ -1,0 +1,62 @@
+#STEP 1
+#adapt the mode function from before to get frequencies of each item,
+
+def freq(data):
+    frequencies = {}        
+    keys = []           
+    values = []         
+    
+    for element in data: 
+        frequencies[element] = 0
+        
+    for element in data:
+        if element in data:
+            frequencies[element] += 1
+            #returns the frequencies and not the number of vehicles as a list
+    return list(frequencies.values())
+
+freq(vehicles)
+
+#STEP 2
+from scipy import special
+import math
+
+l = []     #this list will hold all the Laguerre polynomials from l[0](x) to l[21](x)
+
+for i in range(22): #this loop generates the Laguerre polynomials and appends them to l
+    l.append(special.laguerre(i,monic = True))
+    
+#STEP 3
+product = 1  #initialize a variable to multiply products to, this will be
+             #the product of all Laguerre polynomials
+    
+for i in freq(vehicles):
+    product *= l[i]     #this multiples the polynomials like l[21], l[15] etc... for all
+                        #frequencies in the dataset
+#STEP 4
+factorial_powers = []    #this list will contain the factorials mapped from the powers of the
+                         #product polynomial
+    
+for i in range(product.o,-1,-1):   #product.o is the highest power in the polynomial, counting down
+    factorial_powers.append(math.factorial(i)) #with steps of 1 to 0!, so each term has a factorial
+
+#STEP 5
+#this multiplies the factorials with corresponding coefficients, as product.c returns an array
+#of all the coefficients. This returns an array of the products of the coefficients and factorials
+#this is then summed up
+undivided = sum(factorial_powers*product.c)
+
+#STEP 6
+divisor = 1 #intialize the divisor
+
+#this finds the factorial product for the divisor, every frequency corresponds to a duplicate
+#permutation that we have to divide with. So a frequency of 2 in 'spooky'/{1,2,3,4,5,5} was
+#divided by 2! but also by 1! four times.
+for i in freq(vehicles):         
+    divisor *= math.factorial(i)
+    
+derangements = undivided/divisor  #divides to remove duplicates
+count = sum(freq(vehicles)) #this is so we can calculate 90!
+probability = derangements/math.factorial(count) #this is the familiar derangements/permutations
+
+print('The probability of getting the order of every napkin wrong is ',probability)
