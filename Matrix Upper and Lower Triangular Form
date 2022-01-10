@@ -1,0 +1,49 @@
+def triangular(M):
+    '''Takes in any m x n matrix and returns the lower and upper rectangular forms of the matrix'''
+    #define the matrix as mat and initialize a list to hold elementary matrices
+    mat = M
+    E = []
+    #Begin a nested for-loop 
+    for n in range(mat.nrows()-1):
+        #The nest loops first for number of rows - 1 times for the first column, then
+        #number of rows - 2 times for the second column, then number of rows - 3 times for the third column.
+        #The higher for loop is for iterating through the columns where as the lower loop iterates through the rows.
+        for i in range(mat.nrows()-1-n):
+            #This conditional exists to check if the pivot (on the diagonal) is a 0
+            if mat[n,n] == 0:
+                #Initialize an identity matrix n x n
+                I = identity_matrix(RR,mat.nrows())
+                #We swap rows in the event the pivot is a 0
+                I.swap_rows(n,n+1)
+                #Since a row swap is a row operation and hence an elementary matrix, we append it
+                E.append(I)
+                #We then find the matrix after swapping
+                mat = I*mat
+                #We reinitialize the identity matrix
+                I = identity_matrix(RR,mat.nrows())
+                #We change the element of the identity matrix which reflects a row operation that changes a
+                #row element into 0 which is defined in equation 9 of the paper, specifically the -Rn/Rm where Rm is
+                #the pivot or mat[n,n]. When the higher loop iterates, we know that we are affecting the next row of 
+                #the identity matrix so we add n to the index.
+                I[i+n+1,n] = -((mat[i+n+1,n]/mat[n,n]))
+                #Find the matrix representing the row operation on the previous matrix and append I as an elementary
+                #matrix.
+                mat = I*mat
+                E.append(I)
+            else:
+                #This is the case when the pivot is not 0, following the same steps as above
+                I = identity_matrix(RR,mat.nrows())
+                I[i+n+1,n] = -((mat[i+n+1,n]/mat[n,n]))
+                mat = I*mat
+                E.append(I)
+    #the upper triangular form of the matrix is the matrix after the forward elimination has been applied
+    upper = mat
+    
+    #loop through elementary matrices to invert them
+    for i in range(len(E)):
+        E[i] = E[i].inverse()
+    #initialize an identity matrix to multiply the inverse elementary matrices into to get the lower triangular form 
+    lower = identity_matrix(mat.nrows())
+    for i in range(len(E)):
+        lower = lower*E[i]
+    return lower, upper
