@@ -1,0 +1,25 @@
+### This code cell is for finding the correlation coefficient Pearson's r between two variables
+def pearson(x,y):
+    #Calculate the means of both x and y columns
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+
+    #Calculate the stds of both columns
+    x_std = np.std(x)
+    y_std = np.std(y)
+
+    #Convert into standard units, initialize lists to hold items
+    x_standard = []
+    y_standard = []
+    for i in x:
+        x_standard.append((i-x_mean)/x_std)
+    for i in y:
+        y_standard.append((i-y_mean)/y_std)
+    
+    #Calculate the products of the two standard unit lists
+    products = []
+    for i in range(len(x)):
+        products.append(x_standard[i]*y_standard[i])
+
+    #Return the mean of the products which is Pearson's r
+    return np.mean(products)
