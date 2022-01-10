@@ -1,0 +1,40 @@
+def simulation(n, measurements):
+    right = []         #each entry is the number of correct matches per simulation, 
+                       
+    for sim in range(n):  #one iteration represents 1 simulation
+        one_sim_right = 0 #this counts the number of matches in this one simulation
+        rand_measurements = np.random.choice(measurements,len(measurements),replace=False)
+        for i in range(len(measurements)):  #this checks each 'napkin' to see if it is in the
+                                        #the right order and adds +1 to one_sim_right if it is.
+            if measurements[i] == rand_measurements[i]:
+                one_sim_right += 1
+                
+        right.append(one_sim_right) #this adds the number of matches in one simulation to the list
+        
+    #the following 4 lines set the histogram x axis to show as many unique values show up
+    #and label the axes
+    plt.xlim(0,len(np.unique(right)))
+    plt.xticks(range(len(np.unique(right))))
+    plt.xlabel('Number of correctly matched napkins')
+    plt.ylabel('Probability')
+    
+    #the following plots two normalized histograms representing the Probability distribution function
+    #of the number of correctly matched napkins. The second one gives an overview and the plotly one
+    #lets you mouse over to see the probabilities of each discrete variable. Note: the Y axis is on 
+    #Plotly is meant to represent 'Probability' not 'count'. density=True normalizes the second histogram.
+    #With bins=number of unique values.
+    plt.hist(right, len(np.unique(right)), align='mid', density=True) #takes a second to load
+    itt = px.histogram(right, histnorm='probability density',        
+                        labels ={'variable':'N. of correct napkins',
+                                'value':'Number of correctly matched napkins',
+                                'count':'Probability'}, width=500,height=300)
+    itt.show()   
+    
+    #the following plots a normal distribution from 0-27, using the normal distribution function
+    #with the corresponding mean and SD of the sample.
+    x = np.linspace(0,27,10000)
+    plt.plot(x, stats.norm.pdf(x,mean(right),standard_deviation(right)), label='Normal Distribution')
+    plt.legend()
+    
+simulation(10000, vehicles)
+#simulation(10000, range(90))
