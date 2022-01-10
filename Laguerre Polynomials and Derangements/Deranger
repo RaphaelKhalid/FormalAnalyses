@@ -1,0 +1,49 @@
+def freq(data):
+    frequencies = {}        
+    keys = []           
+    values = []         
+    
+    for element in data: 
+        frequencies[element] = 0
+        
+    for element in data:
+        if element in data:
+            frequencies[element] += 1
+    return list(frequencies.values())
+
+def deranger(data):
+    frequency_list = freq(data)
+    from scipy import special
+    import math
+
+    l = [] 
+
+    for i in range(max(frequency_list)+1): 
+        l.append(special.laguerre(i,monic = True))
+    
+    product = 1  
+    for i in frequency_list:
+        product *= l[i]
+    factorial_powers = [] 
+                         
+    
+    for i in range(product.o,-1,-1):
+        factorial_powers.append(math.factorial(i))
+
+    undivided = sum(factorial_powers*product.c)
+
+    divisor = 1
+    
+    for i in frequency_list:
+        divisor *= math.factorial(i)
+    derangements = undivided/divisor
+    count = sum(frequency_list)
+    probability = derangements/math.factorial(count)
+    print('The number of derangements is ', int(derangements), ' out of {} arrangements'.format(math.factorial(count)))
+    print('The probability of getting a derangement is ',probability, '\n')
+    
+deranger(['s','p','o','o','k','y'])
+
+deranger(['r','a','p','h','a','e','l'])
+
+deranger(['m','i','s','s','i','s','s','i','p','p','i'])
