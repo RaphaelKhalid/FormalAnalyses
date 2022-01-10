@@ -1,0 +1,42 @@
+import pandas as pd     #Import Pandas to display a DataFrame later
+
+print("Enter the logical statement. Input example: write '(A and B) or not C' as (atom[0] and atom[1]) or not atom[2] (Please convert conditionals of the form A → B to not atom[0] or atom[1] for this function)")
+truth = input()    
+table = []              #Initialize an empty list to hold the rows of the truth table as sub-lists.
+
+def recurse(n, atom = []):           
+    '''This is a recursive function which takes n as the number of distinct atomic sentences,
+    returns a truth table for them, and evaluates the logical statement based on that.
+    It defines an empty list atom which will hold the booleans of the atomic sentences and
+    logical statement, append them to table, and repeat for each row.'''
+    if n == 0:          #This defines the base case to evaluate the logical statement after one
+                        #row in the table is ready
+        
+        answer = eval(truth)      #This evaluates your logical statement based on the booleans
+                                  #of the atomic sentences.
+        atom.append(answer)       #This appends the truth value of the logical statement to atom
+        table.append(list(atom))  #This appends one list representing a row to table.
+        atom.pop()                #This removes the recently added answer to atom to reintialize
+                                  #the list for the next set of boolean combinations.
+        
+    else:                         #This defines the general case where recursion occurs. 
+        for i in [True,False]:    #This for loop iterates through and appends atomic sentence
+                                  #boolean combinations to atom, to be evaluated in
+                                  #the base case.
+            atom.append(i)   
+            recurse(n-1, atom)    #This function calls itself with n-1 to recurse for the
+                                  #number of atomic sentences given.
+            atom.pop()            #This removes any None value left behind.
+            
+            
+def truth_table(): 
+    '''This calls on the recursive function, taking the number of atomic sentences as the
+    number of columns, and displays a DataFrame of the Truth Table'''
+    n = int(input('How many atomic sentences? This must be equal to greater than n+1 where n is the largest index of atom[n] in the statement '))
+    recurse(n)                    #Calls the recursion function using the user inputted n
+    pretty_truth_table = pd.DataFrame(table)      #This converts table with sub-lists representing
+                                                  #rows into a DataFrame.
+    display(pretty_truth_table)                   #This displays the DataFrame as the truth table 
+    print('The last column has the truth values of your logical sentence.')
+    print('Your logical sentence is {}.'.format(truth))
+truth_table()                     #Calls the function
