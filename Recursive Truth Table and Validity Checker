@@ -1,0 +1,99 @@
+import pandas as pd       #Import Pandas to create a DataFrame of the truth table later
+                          #Print instructions on format of input, how to stop, and a suggestion    
+print('Enter your premises and conclusion (conclusion must be the last sentence). \nInput example: write "A and B or not C" as "atom[0] and atom[1] or not atom[2]" without the quotation marks. \n(Please convert conditionals of the form A → B to not atom[0] or atom[1] for this function)')
+print('Type "stop" when you have added all your premises and conclusion\n')
+print('Try (atom[0] or atom[1]) as your first premise, and atom[0] as your second premise, and not atom[1] as your conclusion!')
+
+table = []          #Initialize lists to hold the rows of the truth table as sub-lists
+premises = []       #Initialize a list to take the sentences in the argument as strings to use with eval() 
+
+start = True        #Defines a condition for the while loop 
+
+while start:    #This while loop asks for the sentences in the argument until you tell it to stop
+    sentence = input()    #Takes the sentences as strings
+    
+    if sentence.lower() == 'stop': #Condition to stop the while loop, made case insensitive
+                                   #so STOP, stop, StOp etc. work.
+        start = False              #This prevents the while loop from another loop after
+                                   #it has been told to stop 
+        
+    else:                               
+        premises.append(sentence)  #Appends each sentence to the premises as a string
+        
+def recurse(n, atom = []):
+    '''This is a recursive function which takes n as the number of distinct atomic sentences,
+    returns a truth table for them, and evaluates any number of logical statements based on that.
+    It defines an empty list atom which will hold the booleans of the atomic sentences and
+    logical statements, append them to table, and repeat for each row.'''
+    if n == 0:                   #This is the base case of the recursion, it evaluates all
+                                 #the sentences with the atomic sentence truth values of one row.
+                                 #This is returned to for every possible combination
+                                 #of the atomic sentence truth values.
+                    
+        for arg in premises:     #This for loop iterates through the given sentences,
+                                 #evaluates and appends them to atom.
+            answer = eval(arg)  
+            atom.append(answer)
+        table_list = list(atom)  #This represents one row of the truth table
+        for i in range(0,len(premises)):   #This pops the sentence truth values just evaluated
+                                           #to reinitialize atom for another run
+            atom.pop()
+        table.append(table_list) #One row is appended to the table every time
+                                 #the base case is returned to
+        
+    else:   #This is the general case of the recursion, where one combination of
+            #atomic sentence booleans is selected and the recursion begins,
+            #coming back to this when one row is evaluated.                      
+        for i in [True,False]:
+            atom.append(i)       #This appends the atomic sentence truth values to atom,
+                                 #to be used in the base case.
+            recurse(n-1, atom)   #The n-1 ensures that the recursion does not become runaway,
+                                 #and meets the base case,
+            atom.pop()           #This removes any None values left behind
+            
+            
+#The following validation code is adapted from question 3.1            
+
+invalid = []    #Initialize empty lists to keep track of instances of invalidity and validity
+valid = []
+
+def truth_table():
+    '''This function uses the recursive function to return a truth table for an argument, and also assess its validity.
+    The truth table is displayed as a Pandas DataFrame'''
+    n = int(input('How many atomic sentences? Should be greater than or equal to n+1 for the largest atom[n] '))    
+    #This takes the number of atomic sentences, so the recursive function
+    #knows when to go to its base case.
+    recurse(n)              #Calls on the recursive function
+    
+    global invalid          #Calls on lists outside the function
+    global valid
+    
+    for index, line in enumerate(table): #Accesses each row of the truth table 
+
+        #This conditional checks if there is any instance of the premises being
+        #true but the conclusion being false. The premises index is from n to the 
+        #second last index, conclusion index is [-1]. If there is any instance of 
+        #invalidity, the invalid list is filled.
+        if all(line[n:-1]) and (line[-1] == False):       
+            invalid.append(index)
+        elif all(line[n:-1]) and (line[-1] == True):
+            valid.append(index)
+            
+    if invalid: #If the invalid list has any element, this is run and prints the invalidity.
+        print('\nThis argument is invalid! Check line(s) {}!'.format(invalid))    
+        
+    elif valid:#Call out the line with all True premises and conclusion when the argument is valid
+        print('\nThis argument is valid! No line has all True premises with a False conclusion. Also check out line(s) {}!'.format(valid))
+        
+    else:     #For when no line has all True premises and conclusion but the argument is valid
+        print('\nThis argument is valid! No line has all True premises with a False conclusion.')  
+        
+    #Creates a Pandas DataFrame and assigns it to a variable to display                                 
+    PrettyTruthTable = pd.DataFrame(table)   
+    display(PrettyTruthTable)
+    
+    #Calls out which columns are your premises and conclusion for clarity
+    print('The last column is your conclusion, and the {} column(s) before that are your premises in the order of input.\n'.format(len(premises)-1))
+    print('Your premises are {} and your conclusion is {}'.format(premises[:-1], premises[-1])) 
+    
+truth_table() #Calls the function!
