@@ -1,0 +1,33 @@
+import numpy as np
+
+def simulation(n, measurements):
+    all_wrong = 0   #this intializes a counter for when none of the napkins match
+    
+    for sim in range(n):  #one iteration represents 1 simulation
+        right = 0         #track how many napkins match
+        
+        #np.random.choice takes a list, and makes another one by randomly picking items from
+        #the first list. It takes 4 arguments: the list, the number of items to pick, whether to 
+        #repeat picks, and the probability of each pick. The fourth argument defaults to none
+        #meaning every item is equally likely to be picked. replace=False ensures that the list
+        #is considered to have distinct numbers e.g., so [1,2,3,4] can't become [1,1,1,1].
+        rand_measurements = np.random.choice(measurements,len(measurements),replace=False)
+        
+        for i in range(len(measurements)):  #this checks each 'napkin' to see if it is in the
+                                            #the right order and adds +1 to right if it is.
+            if measurements[i] == rand_measurements[i]:
+                right += 1
+                
+        if right == 0:      #after checking all the napkins, if there were no right matches
+            all_wrong += 1  #all_wrong accumulates +1 to track all these instances
+            
+    return (100*(all_wrong/n))#this returns the percentage of all completely incorrect matches
+                              #out of all the simulations run
+
+#this is the case for when there are no 'lucky' matches, each measurement is distinct 
+#even if the values are the same. This means that the values themselves don't matter as
+#we just need 90 distinct numbers, so we can use proxy data range(90) to simulate that.
+print(simulation(10000, range(90)), '%')
+
+#this is the case where there are lucky matches and uses the actual data
+print(simulation(10000, vehicles), '%')
