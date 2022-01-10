@@ -1,0 +1,129 @@
+import pandas as pd #this imports the Pandas library, to be used to format the truth table
+
+#Premises for reference:
+#1. ¬A → ¬C
+#2. A v B
+#3. ¬A
+#4. (B & ¬C) → ¬D
+#5. ¬E → D
+#6. E → F
+#7. F → X
+
+#The following are functions representing the premises:
+def notAimpliesnotC(A,C):
+    '''This returns the boolean value of ¬A → ¬C.'''
+    return A or not C   #for example, ~A→~C is converted to the logically equivalent form not P or Q
+def AorB(A,B):
+    '''This returns the boolean value of A v B.'''
+    return A or B
+def notA(A):
+    '''This returns the boolean value of ¬A.'''
+    return not A
+def BandnotCimpliesnotD(B,C,D):
+    '''This returns the boolean value of (B & ¬C) → ¬D.'''
+    return (not (B and not C)) or not D
+def notEimpliesD(D,E):
+    '''This returns the boolean value of ¬E → D.'''
+    return E or D
+def EimpliesF(E,F):
+    '''This returns the boolean value of E → F.'''
+    return not E or F
+def FimpliesX(F,X):
+    '''This returns the boolean value of F → X.'''
+    return not F or X
+
+rows = []       #initializes a list to append rows of the truth table to
+
+def split_validate_display():
+    """ This splits the raw list of all truth values into evenly sized lists to 
+     create rows of the truth tables as a nested list; Then it validates
+     the premises with the conclusion. And finally displays a Pandas DataFrame
+     of the truth table. 
+     """ 
+
+    global rows #Makes use of the variable outside the function
+    
+    for i in range(0, len(argbool), 14): #Iterates through a row and appends it as a list,
+                                         #14 being no. of columns
+        rows.append(argbool[i:(i + 14)]) #Elements 0:14 as one list, 14:(14+14) as next etc
+        
+    for index, line in enumerate(rows): #Accesses each row of the truth table and the row number
+                            #This conditional checks if there is any instance of all the 
+                            #premises being true with the conclusion being false. The 
+                            #premises are the last 7 elements in a sublist, and the conclusion
+                            #is the 7th element. If there is any instance of invalidity,
+                            #the invalid list is filled. If any line has all true premises
+                            #and conclusion, this is added to valid as an optional but not 
+                            #required addition to the code.
+        if all(line[7:]) and (line[6] == False):       
+            invalid.append(index)
+        elif all(line[7:]) and (line[6] == True):
+            valid.append(index)
+        
+    if invalid: #If the invalid list has any element (not empty), this conditional is True and
+                #prints the invalidity.
+        print('This argument is invalid! Check line {}!'.format(invalid)) 
+        #Calls out which line has the invalid combination
+        
+    elif valid: #If the invalid list is empty, the following print the validity of the argument.
+        print('This argument is valid! No line has all True premises with a False conclusion. Also check out line(s) {}!'.format(valid))
+    else:       #This is for when the argument is valid without any row with all True values
+        print('This argument is valid! No line has all True premises with a False conclusion.')      
+        
+    #Assigns a variable to a Pandas DataFrame which converts each list in rows into a row
+    #and names the columns appropriately. This is solely to enhance the visuals and readability
+    #of the truth table for professional and aesthetic purposes.
+    pretty_truth_table = pd.DataFrame(rows, columns = ['A','B','C','D','E','F','X',
+                                                       'A v B','¬A → ¬C','¬A',
+                                                       '(B & ¬C) → ¬D','¬E → D',
+                                                       'E → F','F → X'])
+    #Displays all rows of the truth table
+    pd.options.display.max_rows = None
+    display(pretty_truth_table)
+
+argbool = []                    #initializes a list to append the booleans of the argument
+invalid = []                    #initializes a list to append instances of invalidity to track
+
+valid = []                      #initializes a list to append instances where the premises and
+                                #conclusion are true as an extra feature of the truth table
+def validity_checker():
+    '''This function generates a truth table for all the atomic sentences,
+    premises and conclusion of the argument and checks for the validity of
+    the argument.'''
+    
+    
+    boolean = [True,False]      #sets the list of binary truth-values to use
+    
+    #this assigns a list of the argument premises as strings to evaluate them using eval()
+    premises = ['notAimpliesnotC(A,C)','AorB(A,B)','notA(A)','BandnotCimpliesnotD(B,C,D)',
+                'notEimpliesD(D,E)','EimpliesF(E,F)','FimpliesX(F,X)']
+    global invalid              #makes use of the variables outside the function
+    global argbool              
+    global valid
+    
+    #these nested for loops iterate through all possible truth-value combinations
+    #of the atomic sentences starting from the lowest nested for loop.
+    for A in boolean:
+        for B in boolean:
+            for C in boolean:
+                for D in boolean:
+                    for E in boolean:
+                        for F in boolean:
+                            for X in boolean:
+                    #this appends one row of atomic sentence booleans to argbool every loop
+                                for i in [A,B,C,D,E,F,X]:
+                                    argbool.append(i)
+                    #this evaluates and appends one row of premise booleans to argbool every loop
+                                for i in premises:
+                                    argbool.append(eval(i))
+    
+    #This calls the function defined above to split the raw list argbool
+    #into evenly sized sub-lists representingthe rows of the truth table,
+    #validate the argument, and display the truth table as Pandas DataFrame
+    split_validate_display()                            
+
+    
+    
+                                     
+                                     
+validity_checker()
