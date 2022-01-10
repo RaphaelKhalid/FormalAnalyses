@@ -1,0 +1,77 @@
+def mean(data):
+    total_sum = 0   #initialize a counter to add numbers to, trying to avoid inbuilt sum function
+    for i in data:  #for loop iterates through the measurements and adds each to the counter
+        total_sum += i
+        
+    mean = total_sum/len(data) #the mean is calculated using sum/N, N = length of list
+    return round(mean,2)       #rounds answer to 2 d.p.
+
+def median(data):
+    sorted_data = list(data)   #creates a duplicate of the data, to prevent changing the original list
+    sorted_data.sort()         #sorts the duplicate list from smallest to largest
+    
+    if len(sorted_data)%2 == 0:   #checks if the list is even numbered
+        index1 = int(len(sorted_data)/2)-1    #This finds the middle 2 positions of the list and
+        index2 = int(len(sorted_data)/2)   #converts them to int so we can use it to index the data
+        
+        #this accesses the middle 2 measurements and averages them to get the median
+        median = (sorted_data[index1]+sorted_data[index2])/2
+        
+    else: #the case where the list is odd numbered
+        index = int(len(sorted_data)/2)  #the median is simply the middle element, the float
+                                         #rounds down to the index of the middle item e.g. [1,2,3]
+                                         #len/2 is 1.5, rounded to 1 which is the index we want
+                
+        median = sorted_data[index]      #this accesses the middle element
+    return median
+
+def mode(data):
+    frequencies = {}    #this intializes a dictionary to track the frequencies of each value
+    
+    keys = []           #these intialize the lists of measurements(keys) and their frequencies
+    values = []         #(values) to call on later.
+    
+    for element in data: #this for loop adds key:value pairs to the dictionary with unique
+        frequencies[element] = 0    # measurements and initializes their frequency to 0
+        
+    for element in data: #this for loop iterates through the data, checks if the element is in
+        if element in data: #the data and adds 1 to its corresponding frequency in the dictionary
+            frequencies[element] += 1  #if it is. 
+            
+    for key, value in frequencies.items(): #for loop accesses key:value pairs for the dictionary
+        keys.append(key)      #adds the unique measurement values to the keys list
+        values.append(value)  #adds the frequency of the unique measurements to values.
+                              #both have the same order so the frequency of keys[0] is values[0]
+            
+    highest_freq = max(values) #this checks what the highest frequency is in values
+    indexes = []               #this intializes a list to add all indexes with the highest freq. to
+    
+    for index, frequency in enumerate(values):  #this finds the indexes where the freq. is highest
+        if frequency == highest_freq:
+            indexes.append(index)    #this adds the index of all modes into indexes
+            
+    for index in indexes:      #this returns the measurements which correspond to the index of
+        return (keys[index])   #highest frequencies from the keys list      
+
+def Range(data):               #this subtracts the smallest from the largest value and returns it 
+    return (max(data) - min(data)) #Range is capitalized because range is a reserved name in python
+
+def standard_deviation(data):  #this function uses the flow of (1)finding the deviations,
+                               #(2)squaring them, (3)summing them, (4)dividing by the number
+                               #of measurements, (5)square-rooting it. (3) and (4) are the
+                               #steps of finding the average (sum/total) so this is condensed.
+                
+    squared_deviations = []    #initialize a list to add squared deviations to
+    
+    for i in data:  #this loop finds (x-mean)^2 for all measurements and adds them to the list
+        squared_deviations.append((i-mean(data))**2)
+        
+         #this averages the list using the mean function from above, square-roots it, and rounds
+         #it to 2 d.p.
+    return round(mean(squared_deviations)**0.5,2)
+
+print('The mean of this dataset is', mean(vehicles))
+print('The median of this dataset is', median(vehicles))
+print('The mode of this dataset is', mode(vehicles))
+print('The range of this dataset is', Range(vehicles))
+print('The standard deviation of this dataset is', standard_deviation(vehicles))
