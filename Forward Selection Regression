@@ -1,0 +1,46 @@
+def forward_selection(predictor_variables):
+    '''This function takes in a list of a predictor variables to compare against
+    the response variable of price from the housing dataset. It returns a list of
+    adj. r^2 values sorted in descending order to display the change in adj. r^2.
+    This function is meant to be called multiple times until one is satisfied with
+    their adj. r^2 value. Calling the function multiple times works because "highest_r2" is
+    appended with the best variable from the last function call.'''
+    
+    
+    for i in predictor_variables:  #this for loop iterates through the statsmodels function using
+                                   #the predictor variables one by one.
+            
+        global highest_r2, r2_all  #ensures that the variables from outside the function are accessed
+        highest_r2.append(i)       #this adds a variable to the list to find its adj. r^2
+        
+                                   #this block of code is adapted from the code from class and calculates
+                                   #a summary table with an adj. r^2 value.
+                
+        X = house[highest_r2]      #this line accesses all the values of a particular predictor variable
+        X = smf.add_constant(X)    #this line ensures that the y-intercept isn't = 0
+        reg = smf.OLS(house['price'], X).fit()    #this assigns the regression model to a variable
+        summary = pd.DataFrame(reg.summary().tables[0]) #this  assigns it to s, converts it into a DataFrame
+        summary.set_index(0)                            #for ease of access.
+                                    
+        r_squared = float(str((summary[3][1])).strip()) #this accesses the adj. r^2 from the summary table,
+                                                        #converting the cell type to a string first then a 
+                                                        #float.
+        r2_all.append(r_squared)                        #this r_squared is finally appended to r2_all
+
+        highest_r2.pop()                                #this allows for the last added value to be removed,
+                                                        #so the next value can be added and checked seperately
+        
+    #this code creates a DataFrame using the predictor variables and their respective adj. r^2 values
+    super_table = pd.DataFrame({'Predictor': predictor_variables, 'R-squared':r2_all})
+    #this line finds the maximum R-squared value variable name (since the list is sorted, its the first item)
+    maximum = (super_table.sort_values('R-squared',ascending=False).iloc[0][0])
+    
+    #the variable we "forward select" is added to highest_r2 and removed from the overall list for the 
+    #next function call
+    highest_r2.append(maximum)
+    predictors.remove(maximum)
+    #reset the r2_all list for the next function call
+    r2_all = []
+    
+    
+    return super_table.sort_values('R-squared',ascending=False), highest_r2
