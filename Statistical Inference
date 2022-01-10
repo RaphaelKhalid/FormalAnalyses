@@ -1,0 +1,104 @@
+#This code cell is for running pairwise t-tests for post-hoc analysis
+
+def ttest_twotailed(data1, data2):
+    '''This function takes into two Pandas series or lists
+    and returns the t-statistic and p-value'''
+    
+    null_value = 0
+    
+    #the point estimate is the difference of sample means
+    point_estimate = np.mean(data1) - np.mean(data2)
+    
+    #these are sample sizes
+    n1 = len(data1)
+    n2 = len(data2)
+    
+    #s1 and s2 are the sample variances using Bessel's
+    #correction of n-1 in the denominator of the standard
+    #deviation formulas. Squaring SD gives variance.
+    s1 = np.std(data1, ddof=1)**2
+    s2 = np.std(data2, ddof=1)**2
+    
+    #this is the weighted average of the sample variances
+    #with degrees of freedom as n1+n2-2
+    df = n1 + n2 - 2
+    s_pooled = (s1*(n1-1) + s2*(n2-1)) / df
+    
+    #this calculates standard error using the pooled variances
+    #rather than individual variances
+    standard_error = ((s_pooled/n1) + (s_pooled/n2))**0.5
+    
+    #the null_value here is 0 but is added for conceptual purposes
+    #the absolute function makes the t-statistic positive so if difference
+    #of means is negative, it won't affect the p-value calculation
+    t = abs((point_estimate-null_value)/standard_error)
+    
+    #stats.t.cdf uses the t-statistic and degrees of freedom to 
+    #calculate area to the left of t-statistic, the complement
+    #of that gives one tail, multiplying by two gives the area
+    #under both tails
+    p_value = (1-stats.t.cdf(t, df))*2
+    
+    #the t-statistic at 99.17% confidence interval/(0.05/6) alpha
+    #value is found.
+    t_at_ci = stats.t.ppf((1-((0.05/6)/2)),df)
+    
+    #Margin of error = t * SE
+    margin_of_error = t_at_ci*standard_error
+    
+    #calculate upper and lower bounds from the point estimate, the CI is a tuple
+    #of these two values rounded to 3 d.p.
+    lower_bound = point_estimate - margin_of_error
+    upper_bound = point_estimate + margin_of_error
+    confidence_interval = (round(lower_bound,3),
+                           round(upper_bound,3))
+    
+    #calculate cohen's d using difference of means/pooled standard deviation
+    #(s_pooled is the pooled standard deviation squared currently so we sqrt it)
+    cohens_d = point_estimate/(s_pooled**0.5)
+    
+    #calculate the correction factor to apply to cohen's d to convert it to hedge's g
+    hedges_factor = (1 - (3/(4*(n1+n2)-9)))
+    hedges_g = cohens_d * hedges_factor
+    
+    #returns t-statistic rounded to 3 d.p., p-value to 6 d.p., the CI, and the point estimate
+    #and hedge's g to 3 d.p.
+    return round(t,3), round(p_value,6), confidence_interval, round(point_estimate, 3), round(hedges_g, 3)
+
+#Use the function defined to return t-statistic, p-value, CI, point estimate and hedge's g
+#for all 6 pairwise comparisons
+comparisons = [ttest_twotailed(higher,secondary),
+               ttest_twotailed(higher,middle),
+               ttest_twotailed(higher,primary),
+               ttest_twotailed(secondary,middle),
+               ttest_twotailed(secondary,primary),
+               ttest_twotailed(middle,primary)]
+
+#Set and initialize lists to be made into columns. Corresponding items in group 1 and 2 are
+#the respective comparisons
+Group_1 = ['Higher','Higher','Higher','Secondary','Secondary','Middle']
+Group_2 = ['Secondary','Middle','Primary','Middle','Primary','Primary']
+t_statistic = []
+p_value = []
+Confidence_Interval = []
+point_estimates = []
+effect_sizes = []
+
+#Only the third comparison between Higher and Primary are below the bonferroni adjusted alpha value
+reject = [False, False, True, False, False, False]
+
+#Start appending the respective statistics to the lists initialized above. The function returns a tuple
+#so you can index and select the values you want, for example the 0th index returns the t-statistic.
+for i in comparisons:
+    t_statistic.append(i[0])
+    p_value.append(i[1])
+    Confidence_Interval.append(i[2])
+    point_estimates.append(i[3])
+    effect_sizes.append(i[4])
+
+#Create a dictionary and convert it to a data frame, using the lists generated above
+summary = pd.DataFrame({'Group 1': Group_1, 'Group 2': Group_2, 't-Statistic': t_statistic, 'p-value': p_value,
+           'Confidence Interval': Confidence_Interval, 'Point Estimate': point_estimates,
+          'Reject Null Hypothesis': reject, "Hedge's g": effect_sizes})
+
+display(summary)
