@@ -1,0 +1,48 @@
+import streamlit as st
+import pandas as pd
+from sklearn import datasets
+from sklearn.ensemble import RandomForestClassifier as RFC
+
+
+st.write('''
+# Simple Iris Flower Prediction
+
+### Predict flower type :)
+''')
+
+st.sidebar.header('User Input Parameters')
+
+def user_input_features():
+    sepal_length = st.sidebar.slider('Sepal length',2.0,8.0,5.0)
+    sepal_width = st.sidebar.slider('Sepal width',2.0,8.0,5.0)    
+    petal_length = st.sidebar.slider('Petal length',2.0,8.0,5.0)
+    petal_width = st.sidebar.slider('Petal width',2.0,8.0,5.0)
+    data = {'Sepal length': sepal_length,
+            'Sepal width': sepal_width,
+            'Petal length': petal_length,
+            'Petal width': petal_width}
+    features = pd.DataFrame(data,index=[0])
+    return features
+data_frame = user_input_features()
+
+st.subheader('User Input Parameters')
+st.dataframe(data_frame,1500,500)
+
+iris = datasets.load_iris()
+x = iris.data
+y = iris.target
+
+classifier = RFC()
+classifier.fit(x,y)
+
+prediction = classifier.predict(data_frame)
+prediction_probability = classifier.predict_proba(data_frame)
+
+st.subheader('Class labels and their corresponding indices')
+st.write(iris.target_names)
+
+st.subheader('Prediction')
+st.write(iris.target_names[prediction])
+
+st.subheader('Probability')
+st.write(prediction_probability)
