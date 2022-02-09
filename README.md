@@ -1,3 +1,3 @@
 # FA
 
-Code from Formal Analyses Assignments
+Code from Formal Analyses
