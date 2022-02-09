@@ -1,0 +1,57 @@
+from json import load
+import streamlit as st
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.ensemble import RandomForestClassifier as RFC
+
+st.write(
+'''
+# Penguin Prediction App
+
+Predicts the species of the Palmer Penguins :)
+
+Data from palmerpenguins library, cleaned by Data Professor
+
+'''
+)
+
+st.sidebar.header('User Inputs')
+
+def user_input_features():
+    island = st.sidebar.selectbox('Island',('Biscoe','Dream','Torgersen'))
+    sex = st.sidebar.selectbox('Sex',('male','female'))
+    bill_length_mm = st.sidebar.slider('Bill Length (mm)',30,60,45)
+    bill_depth_mm = st.sidebar.slider('Bill Depth(mm)',10,25,18)
+    flipper_length_mm = st.sidebar.slider('Flipper Length(mm)',170,240,200)
+    body_mass_g = st.sidebar.slider('Body Mass (g)',2500,7000,4500)
+    data = {'island':island,'sex':sex,'bill_length_mm':bill_length_mm,
+    'bill_depth_mm':bill_depth_mm,'flipper_length_mm':flipper_length_mm,'body_mass_g':body_mass_g}
+    variables = pd.DataFrame(data,index=[0])
+    return variables
+
+input_df = user_input_features()
+penguins = pd.read_csv('penguins_cleaned.csv').drop(columns=['species'])
+
+df = pd.concat([input_df,penguins],axis=0)
+
+encode =['sex','island']
+for col in encode:
+    dummy = pd.get_dummies(df[col],prefix=col)
+    df = pd.concat([df,dummy],axis = 1)
+    del df[col]
+df = df[:1]
+st.subheader('User Inputs')
+st.write(df)
+
+load_classifier = pickle.load(open('penguins_clf.pkl','rb'))
+
+prediction = load_classifier.predict(df)
+probability = load_classifier.predict_proba(df)
+
+st.subheader('Prediction')
+species = np.array(['Adelie','Chinstrap','Gentoo'])
+st.write(species[prediction])
+
+st.subheader('Probability')
+st.write(probability)
