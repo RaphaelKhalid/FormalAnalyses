@@ -1,0 +1,40 @@
+def incremental_max_subarray(x, mx):
+    """ 
+    Inputs:
+    - x: a NON-EMPTY list of numbers (e.g., the array B in the first two questions above). 
+        * If x has 1 element: returns the value of the element regardless of the value of mx
+    - mx: the maximum subarray of x excluding its last element (i.e., compute the 
+    maximum subarray of the input array x considering only its first len(x) - 1 elements)
+    
+    Output: The maximum subarray of the array x.
+    """
+    
+    
+    #Initialize variables
+    max_sum = float('-inf')
+    current_sum = 0
+    index_of_mx = 0
+    
+    #If length of list is 1, return item
+    if len(x) == 1:
+        return x[0]
+    
+    
+    else:
+        
+        #Iterate through the array, adding iteratively and updating sums
+        for i in range(0, len(x)-1):
+            current_sum += x[i]
+            if current_sum > max_sum:
+                max_sum = current_sum
+                
+                #Finds index of previous max subarray
+                index_of_mx = i
+                
+            #Reset for negative numbers    
+            if(current_sum < 0):
+                current_sum = 0
+
+        #Value of subarray with last item included, returns higher one
+        mx_with_last = sum(x[index_of_mx:])
+        return max(mx,mx_with_last)
