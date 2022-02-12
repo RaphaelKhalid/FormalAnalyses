@@ -1,0 +1,33 @@
+def merge_sort(A,p,r):
+    '''
+    Sorts an array between given indexes using the merge-sort algorithm
+    
+    Parameters
+    ----------
+    A: list
+        input array
+    p: int
+        starting index
+    q: int
+        ending index
+    
+    Returns
+    ----------
+    list
+        Array with items A[p:r] sorted in ascending order 
+    '''
+    
+    #Base case: once p >= r the subarray has 1 element
+    
+    if p < r:
+        
+        #Mid-point using floor division
+        q = (p+r)//2
+        
+        #Recursive calls for left and right sub arrays
+        merge_sort(A,p,q)
+        merge_sort(A,q+1,r)
+        
+        #Merging the subarrays
+        merge(A,p,q,r)
+    return A
