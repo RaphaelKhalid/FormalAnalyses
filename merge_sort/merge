@@ -1,0 +1,51 @@
+def merge(A, p, q, r):
+    '''Returns a merged array for A between indexes p and r with index q as the splitting point
+    
+    Parameters
+    -----------
+    A: list
+        input array
+    p,q,r: int
+        indexing instructions, p is start index, r is final index, q is middle index
+    
+    Returns
+    ----------
+    list
+        Array A with elements from p to r with two merged sorted sublists.
+    '''
+    
+    #Define left and right arrays
+    L = A[p:q+1]
+    R = A[q+1:r+1]
+    
+    #Initialize indexing variables
+    i = 0
+    j = 0
+    k = p
+    
+    #Condition to ensure list index in range
+    while i < len(L) and j < len(R):
+        
+        #Compare left most elements and assign smallest value to A
+        
+        if L[i] <= R[j]:
+            A[k] = L[i]
+            i += 1
+        else:
+            
+        #Compare left most elements and assign smallest value to A
+            A[k] = R[j]
+            j += 1
+        k += 1
+    
+    #Place leftover items from one subarray back into A
+    if i >= len(L):
+        for leftover in R[j:]:
+            A[k] = leftover
+            k+=1
+    if j >= len(R):
+        for leftover in L[i:]:
+            A[k] = leftover
+            k+=1
+            
+    return A
