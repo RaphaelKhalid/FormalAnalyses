@@ -1,0 +1,12 @@
+def bubble_sort(A):
+    # your code here
+    '''Takes in a list of real numbers and returns a sorted list using the bubble sort algorithm'''
+    
+    
+    for i in range(0,len(A)-1):
+        
+        #This loop is where the comparisons happen, check if the item on the left is bigger than the right, if so then swap and continue down
+        for j in range(len(A)-1,i,-1):
+            if A[j] < A[j-1]:
+                A[j], A[j-1] = A[j-1], A[j]
+    return A
