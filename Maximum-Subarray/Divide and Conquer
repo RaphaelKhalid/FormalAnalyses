@@ -1,0 +1,41 @@
+def divide_max_subarray(A):
+    '''
+    This implementation of the max subarray problem which finds a contiguous subarray of A with the greatest sum
+    
+    Parameters
+    -----------
+    A: list
+        input array
+   
+    Returns
+    ----------
+    max_left, max_right
+        Indices for the left and right indices, i.e., starting and ending indices of the maximum subarray
+    
+    max_subarray_sum
+        The sum of the maximum subarray
+        
+    '''
+    
+    
+    max_left = 0
+    max_right = 0
+    
+    left_sum = min(A)
+    subarray_sum = 0
+    for i in range(len(A)//2-1,-1,-1):
+        subarray_sum += A[i]
+        if subarray_sum > left_sum:
+            left_sum = subarray_sum
+            max_left = i
+    
+    
+    right_sum = min(A)
+    subarray_sum = 0
+    for j in range(len(A)//2,len(A)):
+        subarray_sum += A[j]
+        if subarray_sum > right_sum:
+            right_sum = subarray_sum
+            max_right = j
+    max_subarray_sum = left_sum+right_sum 
+    return(max_left,max_right,max_subarray_sum)
