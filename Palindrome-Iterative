@@ -1,0 +1,28 @@
+import math
+def is_palindrome_iterative(word):
+    """
+    This function identifies whether a word is a palindrome iteratively.
+    Parameters
+    ----------
+    word : str
+        Word we wish to check
+    Returns
+    -------
+    bool
+        True if input is a palindrome, False otherwise       
+    """
+    ## your code here
+    
+    #Turn the input into lowercase to account for capitalizations
+    lower_word = ''.join(word.split()).lower()
+    
+    
+    #initialize a list to hold the boolean values of comparisons
+    bool_list = []
+    
+    #For loop for comparisons, iterating half the length of the word rounded time. So a 5 letter word has 2 comparisons: 1st and last, 2nd and 2nd last.
+    for i in range(math.floor(len(lower_word)/2)):
+        #Check if index and corresponding outer index match. 0th corresponds to -1st, 1st to -2nd, 2nd to -3rd etc...
+        bool_list.append(lower_word[i] == lower_word[-(i+1)])
+    #if all comparisons are true then returns true, else false.
+    return all(bool_list)
