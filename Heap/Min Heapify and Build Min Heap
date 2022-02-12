@@ -1,0 +1,45 @@
+def left(i):
+    # your code here
+    return 2*i+1
+def right(i):
+    # your code here
+    return 2*i+2
+
+
+def min_heapify(heap, i):
+    """
+    Inputs:
+    - heap: a list of floats. Assume that the heap size is the length of the heap.
+    
+    No output is needed. This function should modify the heap in-place (if needed).
+    """
+    #Find index of left and right child
+    l = left(i)
+    r = right(i)
+    heapsize = len(heap)-1
+    
+     #Find smallest amongst left, right, parent node
+    if l <= heapsize and heap[l] < heap[i]:
+        smallest = l
+    else:
+        smallest = i
+    if r <= heapsize and heap[r] < heap[smallest]:
+        smallest = r
+        
+    #Swap when necessary and float down    
+    if smallest != i:
+        heap[i],heap[smallest] = heap[smallest], heap[i]
+        min_heapify(heap,smallest)
+
+def build_min_heap(A):
+    """
+    Input:
+    - A: a list of floats.
+    
+    No output is needed. The function should turn A into a valid min heap, in-place.
+    """
+    heapsize = len(A) - 1
+    for i in range(int(heapsize//2),-1,-1):
+        min_heapify(A,i)
+        
+build_min_heap(H)
