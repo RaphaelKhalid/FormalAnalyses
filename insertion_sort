@@ -1,0 +1,21 @@
+def insertion_sort(A):
+    ''' Takes in a list of real numbers and returns a sorted list using the insertion sort algorithm''' 
+    
+    #Iterate through the length of the list excluding the first item (since there is no item to its left)
+    for j in range(1, len(A)):
+        
+        #Selects the current item as key, and saves the index of the item to its left as i
+        key = A[j]
+        i = j-1
+        
+        #Checks to make sure we aren't negative indexing, and that the item on the left of the key is larger (and needs to be sorted)
+        while i >= 0 and A[i] > key:
+        
+        #Replace the larger item on the right once and decrease index by 1 to continue    
+            A[i+1] = A[i]
+            i -= 1
+        
+        #Reintroduce the item to be sorted in the correct position     
+        A[i+1] = key
+        
+    return A
