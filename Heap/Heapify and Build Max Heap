@@ -1,0 +1,51 @@
+def left(i):
+    # your code here
+    return 2*i+1
+def right(i):
+    # your code here
+    return 2*i+2
+def heapify(heap, i):
+    """
+    Inputs:
+    - heap: a list of floats. Assume that the heap size is the length of the heap.
+    
+    No output is needed. This function should modify (if necessary) heap in-place.
+    """
+    
+    #Find index of left and right child
+    l = left(i)
+    r = right(i)
+    heapsize = len(heap)-1
+    
+    #Find largest amongst left, right, parent node
+    if l <= heapsize and heap[l] > heap[i]:
+        largest = l
+    else:
+        largest = i
+    if r <= heapsize and heap[r] > heap[largest]:
+        largest = r
+        
+    #Swap when necessary and float down
+    if largest != i:
+        heap[i],heap[largest] = heap[largest], heap[i]
+        heapify(heap,largest)
+    
+
+A = [39, 85, 85, 16, 49, 7, 49, 92, 76, 15, 21, 30, 29, 31, 28]
+heapify(A,0)
+assert(A == [85, 49, 85, 16, 39, 7, 49, 92, 76, 15, 21, 30, 29, 31, 28])
+
+B = [16, 4, 10, 14, 7, 9, 3, 2, 8, 1]
+heapify(B, 1)
+assert(B == [16, 14, 10, 8, 7, 9, 3, 2, 4, 1])
+
+def build_max_heap(A):
+    """
+    Input:
+    - A: a list of floats.
+    
+    No output is needed. The function should turn A into a valid max heap, in-place.
+    """
+    heapsize = len(A) - 1
+    for i in range(int(heapsize//2),-1,-1):
+        heapify(A,i)
