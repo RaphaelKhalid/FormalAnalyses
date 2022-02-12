@@ -1,0 +1,20 @@
+def selection_sort(A):
+    '''Takes in a list of numbers and returns the sorted list using the selection sort algorithm'''
+    
+    n = len(A)
+    
+    #Iterate through all but the last element (since we won't need to check after the last time)
+    for i in range(n-1):
+    
+    #Set minimum index as the first value in the unsorted sublist
+        minidx = i
+        
+        #Iterate from the right of the minimum index to the end, replacing minidx as appropriate
+        for j in range(i+1,n):
+            if A[j] < A[minidx]:
+                minidx = j
+        
+        #Reassign the minimum found in the unsorted list to the right of the sorted sublist
+        A[i],A[minidx] = A[minidx],A[i]
+        
+    return A
