@@ -1,0 +1,30 @@
+def is_palindrome_recursive(word):
+    """
+    This function identifies whether a word is a palindrome recursively.
+
+    Parameters
+    ----------
+    word : str
+        Word we wish to check
+    
+    Returns
+    -------
+    boolean
+        True if input is a palindrome, False otherwise
+        
+    """
+    # your code here
+    
+    #Turn input into lowercase to account for capitalizations
+
+    lower_word = ''.join(word.split()).lower()
+    
+    #These are the base cases, when the length of the string reaches 1 or 0, it means you can return true
+    if len(lower_word) <=1:
+        return True 
+    #This is another base case for when there is a mismatch in the characters indicating that it isn't a palindromic word
+    if lower_word[0] != lower_word[-1]:
+        return False
+    #Here we recursively call the function on itself, this time the input is the word without the first and last characters all the way until we reach 1 or 0 characters
+    else:
+        return is_palindrome_recursive(lower_word[1:-1])
