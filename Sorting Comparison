@@ -1,0 +1,126 @@
+# your code here
+
+def insertion_sort(A):
+    ''' Takes in a list of real numbers and returns a sorted list using the insertion sort algorithm''' 
+    
+    steps = 0
+    
+    #Iterate through the length of the list excluding the first item (since there is no item to its left)
+    for j in range(1, len(A)):
+        
+        #Selects the current item as key, and saves the index of the item to its left as i
+        key = A[j]
+        i = j-1
+        steps += 2
+        
+        #Checks to make sure we aren't negative indexing, and that the item on the left of the key is larger (and needs to be sorted)
+        while i >= 0 and A[i] > key:
+            steps += 1
+            
+        #Replace the larger item on the right once and decrease index by 1 to continue    
+            A[i+1] = A[i]
+            i -= 1
+            steps += 2
+        
+        #Reintroduce the item to be sorted in the correct position     
+        A[i+1] = key
+        steps += 1
+    return steps
+
+def bubble_sort(A):
+    
+    '''Takes in a list of real numbers and returns a sorted list using the bubble sort algorithm'''
+    
+    steps = 0
+    
+    for i in range(0,len(A)-1):
+        
+        #This loop is where the comparisons happen, check if the item on the left is bigger than the right, if so then swap and continue down
+        for j in range(len(A)-1,i,-1):
+            steps += 1
+            if A[j] < A[j-1]:
+                A[j], A[j-1] = A[j-1], A[j]
+                steps += 2
+    return steps
+
+def selection_sort(A):
+    '''Takes in a list of numbers and returns the sorted list using the selection sort algorithm'''
+    
+    steps = 0
+    
+    n = len(A)
+    steps += 1
+    
+    #Iterate through all but the last element (since we won't need to check after the last time)
+    for i in range(n-1):
+    
+    #Set minimum index as the first value in the unsorted sublist
+        minidx = i
+        steps+= 1
+        
+        #Iterate from the right of the minimum index to the end, replacing minidx as appropriate
+        for j in range(i+1,n):
+            steps += 1 
+            if A[j] < A[minidx]:
+                minidx = j
+                steps+=1
+        
+        #Reassign the minimum found in the unsorted list to the right of the sorted sublist
+        A[i],A[minidx] = A[minidx],A[i]
+        steps += 2
+    
+    return steps
+
+
+#Initialize lists to add step and time counts
+#Merge sort step/time counters in 2 code cells above.
+
+bubble_step_count = []
+bubble_time_count = []
+insertion_step_count = []
+insertion_time_count = []
+selection_step_count = []
+selection_time_count = []
+
+#Add step and time counts for 3 previous algorithms
+import time
+for k in range(1,16):
+    list_k = [i for i in range(100*k, 0, -1)]
+    start = time.time()    
+    bubble_step_count.append(bubble_sort(list_k))
+    end = time.time()
+    bubble_time_count.append(end - start)
+    
+for k in range(1,16):
+    list_k = [i for i in range(100*k,0,-1)]
+    start = time.time()    
+    selection_step_count.append(selection_sort(list_k))
+    end = time.time()
+    selection_time_count.append(end - start)
+
+for k in range(1,16):
+    list_k = [i for i in range(100*k,0,-1)]
+    start = time.time()    
+    insertion_step_count.append(insertion_sort(list_k))
+    end = time.time()
+    insertion_time_count.append(end - start)
+
+                            
+k = list(range(1,16))
+
+#Plots
+
+import matplotlib.pyplot as plt
+plt.figure(1)
+plt.plot(k,bubble_step_count,label='Bubble')
+plt.plot(k,selection_step_count,label='Selection')
+plt.plot(k,insertion_step_count,label='Insertion')
+plt.plot(k,merge_step_count,label='Merge')
+plt.ylabel('Steps')
+plt.legend()
+plt.figure(2)
+plt.plot(k,bubble_time_count,label='Bubble')
+plt.plot(k,selection_time_count,label='Selection')
+plt.plot(k,insertion_time_count,label='Insertion')
+plt.plot(k,merge_time_count,label='Merge')
+plt.ylabel('Seconds')
