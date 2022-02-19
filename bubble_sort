@@ -1,3 +1,5 @@
+
+#Pseudocode from Cormen et al.
 def bubble_sort(A):
     # your code here
     '''Takes in a list of real numbers and returns a sorted list using the bubble sort algorithm'''
