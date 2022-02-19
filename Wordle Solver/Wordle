@@ -1,0 +1,211 @@
+###   Wordle Solver   ###
+
+### Input for grey words should look like c,r,a,n,e i.e. letters separated by commas in one input
+#Press enter if there are no grey words. Order doesn't matter for grey letters.
+
+### Input for yellow and green words should look like:
+#c
+#r
+#press enter to skip
+#n
+#e
+#Where each letter corresponds to the position of the colour. Press enter if a yellow/green letter isn't
+#in that position
+#You can also type skip when there are no yellow or green letters
+
+
+#Import a list of allowed wordle guesses - courtesy of @cfreshman
+#https://gist.github.com/cfreshman/cdcdf777450c5b5301e439061d29694c
+
+### In the event that the allowed guesses list changes/is incomplete, you can import the word list from
+# nltk using the following code:
+
+# from nltk.corpus import words
+# word_list = words.words()
+# # prints 236736
+
+
+# five_letter_words_list = []
+# for i in word_list:
+#     if len(i) == 5:
+#         five_letter_words_list.append(i)
+# #Make all words lower case
+# five_letter_words_list = [i.lower() for i in five_letter_words_list]
+# #Remove duplicates
+# five_letter_words_list = list(dict.fromkeys(five_letter_words_list))
+
+
+
+text_file = open("wordle-allowed-guesses.txt", "r")
+
+text_list = text_file.readlines()
+wordle_allowed_guesses = [i[0:5] for i in text_list]
+
+
+#Functions to get positions of letters
+
+
+def get_green_letter(green_letter = {}):
+    '''
+    
+    Gets the position(s) of all letters which are guessed exactly correctly (letter and position)
+    
+    Returns:
+        dict - A dictionary with the key as a "green" letter, and value as the position of that letter
+
+
+    '''
+    
+    #Ask for green letter for each position
+    
+    for index in range(5):
+        
+        
+        green = input(f'For letter number {index+1}, list the letter if it is green, otherwise press enter to skip to the next, type skip if there are no green letters')
+        
+        
+        if green == 'skip':
+            break
+        
+        
+        elif green in green_letter.keys():
+            green_letter[green].append(index)
+
+
+        elif green not in green_letter.keys():
+            green_letter[green] = []
+            green_letter[green].append(index)
+    
+    if '' in green_letter.keys():
+        del green_letter['']
+    
+    return green_letter
+
+def get_yellow_letter(yellow_letter = {}):
+    
+    '''
+    
+    Gets the position(s) of all letters which are guessed correctly but in the wrong position
+    
+    Returns:
+        dict - A dictionary with the key as a "yellow" letter, and value as the position of that letter
+
+    '''
+    
+    
+    for index in range(5):
+        yellow = input(f'For letter number {index+1}, list the letter if it is yellow, otherwise press enter to skip to the next, type skip if there are no yellow letters')
+
+        if yellow == 'skip':
+            break
+        
+        elif yellow in yellow_letter.keys():
+            yellow_letter[yellow].append(index)
+
+
+        elif yellow not in yellow_letter.keys():
+            yellow_letter[yellow] = []
+            yellow_letter[yellow].append(index)
+    
+    if '' in yellow_letter.keys():
+        del yellow_letter['']
+    
+    return yellow_letter
+
+
+def get_grey_letter():
+    
+    '''
+    
+    Gets all the letters which are guessed entirely incorrectly (don't exist in the word)
+    
+    Returns:
+        list - A list with "grey" letters
+
+    '''
+    
+    grey_letter = list(input(f'List the grey letters, separating with commas e.g. c,r,a,n. Press enter if none are grey.'))
+
+    grey_letter = [i for i in grey_letter if i != ',']
+    
+    if '' in grey_letter:
+        grey_letter = []
+        
+    
+    return grey_letter
+
+import random
+
+
+def wordle_guess(five_letter):
+    '''
+    
+    
+    A function which suggests a number of potential next guesses based on filtering the word list
+    
+    
+    Parameter:
+        
+        list - A list of possible input words which will be narrowed down each iteration
+    
+    
+    Returns:
+        
+        list - A list of possible next guesses based on filtered list
+        
+        int - The length of the remaining guess list
+        
+        list - A list of all possible guesses remaining after filtering
+        
+    '''
+    
+    #Initialize letter positions
+    
+    grey_letter = get_grey_letter()
+    yellow_letter = get_yellow_letter()
+    green_letter = get_green_letter()
+
+    
+    
+    #Remove duplicate letters from grey list
+    for letter in green_letter.keys():
+            for i in range(len(green_letter[letter])):
+                if letter in grey_letter:
+                    grey_letter.remove(letter)
+
+    #Filter word list based on what letters shouldn't be there
+    for letter in grey_letter:
+        five_letter = [word for word in five_letter if letter not in word]
+
+
+    #Filter word list based on what letters should be there but not in the same position
+    for letter,lst in yellow_letter.items():
+        for position in lst:
+            five_letter = [word for word in five_letter if letter != word[position] and letter in word]
+
+    #Filter word list based on what letters should be there in the same position
+    for letter, lst in green_letter.items():
+        for position in lst:
+            five_letter = [word for word in five_letter if letter == word[position]]
+    
+    #Returns 25 guesses if the remaining word list is greater than 25 words
+    if len(five_letter) > 25:
+        next_guess = random.sample(five_letter,25)
+    
+    #Returns all guesses if remaining word list is less than 25 words
+    else:
+        next_guess = random.sample(five_letter,len(five_letter))
+    
+    
+    return next_guess, len(five_letter), five_letter
+
+def wordle():
+    
+    #5 guesses after initial guess (first guess is your choice!)
+
+    database = wordle_allowed_guesses.copy()
+    for i in range(5):
+        next_guess,length,database = wordle_guess(database)
+        print(next_guess,length)
+wordle()
+%reset
