@@ -1,3 +1,5 @@
+#Pseudocode from Cormen et al.
+
 def selection_sort(A):
     '''Takes in a list of numbers and returns the sorted list using the selection sort algorithm'''
     
