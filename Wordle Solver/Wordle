@@ -15,7 +15,7 @@
 
 
 #Import a list of allowed wordle guesses - courtesy of @cfreshman
-#https://gist.github.com/cfreshman/cdcdf777450c5b5301e439061d29694c
+#https://gist.github.com/cfreshman/a03ef2cba789d8cf00c08f767e0fad7b
 
 ### In the event that the allowed guesses list changes/is incomplete, you can import the word list from
 # nltk using the following code:
@@ -36,7 +36,7 @@
 
 
 
-text_file = open("wordle-allowed-guesses.txt", "r")
+text_file = open("wordle-answers-alphabetical.txt", "r")
 
 text_list = text_file.readlines()
 wordle_allowed_guesses = [i[0:5] for i in text_list]
