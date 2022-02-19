@@ -1,3 +1,6 @@
+#Pseudocode from Cormen et al.
+
+
 def left(i):
     # your code here
     return 2*i+1
